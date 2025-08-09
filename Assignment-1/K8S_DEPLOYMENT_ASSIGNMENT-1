@@ -1,0 +1,130 @@
+Kubernetes Assignment – Deploy NGINX Using EKS and EC2
+
+This document walks through deploying a Kubernetes cluster on Amazon EKS, setting it up from an EC2 instance, and deploying an NGINX application using a Kubernetes Deployment with 3 replicas. It also explains key Kubernetes objects like Pods, ReplicaSets, and Deployments.
+
+Step 1: EC2 Management Host Setup
+
+1. Launch an EC2 instance (Ubuntu or Amazon Linux) to act as your Kubernetes management host.
+2. Attach an IAM role with the following policies:
+   - AmazonEKSClusterPolicy
+   - AmazonEKSWorkerNodePolicy
+   - AmazonEC2FullAccess
+   - IAMFullAccess
+   - CloudFormationFullAccess 
+
+or Simple Add 
+- AdministratorAccess
+
+3. Install kubectl:
+   curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.19.6/2021-01-05/bin/linux/amd64/kubectl
+   chmod +x ./kubectl
+   sudo mv ./kubectl /usr/local/bin
+   kubectl version --short --client
+
+4. Install eksctl:
+   curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+   sudo mv /tmp/eksctl /usr/local/bin
+   eksctl version
+
+Step 2: Launch a 3-Node EKS Cluster
+
+Run the following command to create an EKS cluster with 2 worker nodes:
+
+eksctl create cluster \
+  --name my-lab-cluster \
+  --region ap-south-1 \
+  --nodegroup-name linux-nodes \
+  --node-type t2.micro \
+  --nodes-min 2 \
+  --nodes-max 2 \
+  --zones ap-south-1a,ap-south-1b
+
+This will take ~10–15 minutes.
+
+Step 3: Create NGINX Deployment Using YAML
+
+1. Create a file named nginx-deployment.yaml:
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+
+2. Apply the deployment:
+   kubectl apply -f nginx-deployment.yaml
+
+3. Verify that the 3 pods are running:
+   kubectl get pods
+
+Step 4 (Optional): Expose the NGINX App
+
+If you want to access NGINX in your browser:
+
+kubectl expose deployment nginx-deployment --type=NodePort --port=80
+kubectl get svc
+
+Get the NodePort and open in browser using:
+http://<EC2-Worker-Node-Public-IP>:<NodePort>
+
+Kubernetes Objects Explained
+
+Pod
+- Smallest deployable unit in Kubernetes.
+- A pod encapsulates one or more containers.
+- Each pod in this deployment runs an NGINX container.
+
+ReplicaSet
+- Ensures a specified number of pod replicas are running at all times.
+- Automatically replaces failed or terminated pods.
+- Created and managed by a Deployment.
+
+Check:
+kubectl get rs
+
+Deployment
+- High-level object for managing applications.
+- Handles rollout, updates, scaling, and rollback.
+- In this case, your deployment:
+  - Manages a ReplicaSet
+  - Ensures 3 NGINX pods are running
+
+Check:
+kubectl get deployments
+kubectl describe deployment nginx-deployment
+
+Summary
+
+Task | Command
+-----|---------
+Check nodes | kubectl get nodes
+Deploy NGINX | kubectl apply -f nginx-deployment.yaml
+Scale pods (if needed) | kubectl scale deployment nginx-deployment --replicas=3
+Expose service | kubectl expose deployment nginx-deployment --type=NodePort --port=80
+Check services | kubectl get svc
+
+References
+
+- AWS EKS Documentation: https://docs.aws.amazon.com/eks/latest/userguide/getting-started-eksctl.html
+- Kubernetes Official Docs: https://kubernetes.io/docs/home/
+
+Author
+
+Created by: Kshitij
+GitHub: https://github.com/Kshitij0253
