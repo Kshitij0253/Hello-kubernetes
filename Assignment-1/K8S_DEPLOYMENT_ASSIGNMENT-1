@@ -67,6 +67,28 @@ spec:
           ports:
             - containerPort: 80
 
+--test 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3  # This will create 3 replicas of NGINX
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+
+
 2. Apply the deployment:
    kubectl apply -f nginx-deployment.yaml
 
