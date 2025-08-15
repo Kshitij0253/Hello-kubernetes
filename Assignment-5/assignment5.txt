@@ -1,0 +1,109 @@
+Assignment 5: Deploy NGINX with 3 Replicas, ClusterIP Service, and Ingress
+
+---------------------------------------------
+Tasks To Be Performed:
+1. Use the previous deployment (modify if needed).
+2. Deploy an NGINX deployment with 3 replicas.
+3. Create an NGINX service of type ClusterIP.
+4. Create an Ingress resource to expose the NGINX service.
+
+---------------------------------------------
+Step 1: Modify NGINX Deployment to 3 replicas
+
+Method 1: Scale deployment using kubectl scale
+------------------------------------------------
+kubectl scale deployment nginx-deployment --replicas=3
+
+Method 2: Edit deployment YAML directly
+-----------------------------------------
+kubectl edit deployment nginx-deployment
+
+- Change:
+  replicas: 5
+- To:
+  replicas: 3
+
+Save and exit.
+
+Verify:
+kubectl get pods
+
+---------------------------------------------
+Step 2: Create ClusterIP Service for NGINX
+
+Create a file named nginx-clusterip-service.yaml with:
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-clusterip-service
+spec:
+  type: ClusterIP
+  selector:
+    app: nginx
+  ports:
+    - port: 80
+      targetPort: 80
+
+Apply service:
+kubectl apply -f nginx-clusterip-service.yaml
+
+Verify service:
+kubectl get svc
+
+---------------------------------------------
+Step 3: Create Ingress Resource
+
+Prerequisite: Ensure you have an ingress controller installed (e.g., nginx ingress controller).
+
+Create a file named nginx-ingress.yaml:
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - host: nginx.example.com  # Replace this with your domain or any placeholder
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nginx-clusterip-service
+                port:
+                  number: 80
+
+Apply ingress:
+kubectl apply -f nginx-ingress.yaml
+
+Verify ingress:
+kubectl get ingress
+
+---------------------------------------------
+Explanation about host in Ingress:
+
+- The 'host' defines the domain name that routes traffic to the backend service.
+- Replace 'nginx.example.com' with your real domain name or a placeholder.
+- For local testing, map this domain to the ingress controller's IP in your /etc/hosts file.
+
+Example for local testing:
+Add to /etc/hosts
+<INGRESS_CONTROLLER_IP> nginx.example.com
+
+Access via browser:
+http://nginx.example.com
+
+---------------------------------------------
+Summary:
+
+- Deployment scaled to 3 replicas.
+- ClusterIP service created for internal communication.
+- Ingress resource created to expose the service externally.
+- Remember, ingress requires a controller installed in the cluster.
+
+---------------------------------------------
+End of Assignment 5
