@@ -35,16 +35,6 @@ eksctl create cluster \
   --region ap-south-1 \
   --nodegroup-name linux-nodes \
   --node-type t2.micro \
-  --nodes-min 2 \
-  --nodes-max 2 \
-  --zones ap-south-1a,ap-south-1b
-
---test
-eksctl create cluster \
-  --name my-lab-cluster \
-  --region ap-south-1 \
-  --nodegroup-name linux-nodes \
-  --node-type t2.micro \
   --nodes 3 \
   --nodes-min 3 \
   --nodes-max 3 \
@@ -57,29 +47,6 @@ Step 3: Create NGINX Deployment Using YAML
 
 1. Create a file named nginx-deployment.yaml:
 
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx-deployment
-  labels:
-    app: nginx
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: nginx
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-        - name: nginx
-          image: nginx:latest
-          ports:
-            - containerPort: 80
-
---test 
 apiVersion: apps/v1
 kind: Deployment
 metadata:
