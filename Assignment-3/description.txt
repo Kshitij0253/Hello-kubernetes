@@ -1,0 +1,64 @@
+Assignment 3: Scaling Existing NGINX Deployment to 5 Replicas
+
+---------------------------------------------
+✅ Task: Use Previous Deployment and Change Replicas to 5
+---------------------------------------------
+
+### Method 1: Using kubectl scale command (Quick and Easy)
+1. Scaled the deployment to 5 replicas using:
+   kubectl scale deployment nginx-deployment --replicas=5
+
+2. Verified the deployment scaled successfully:
+   kubectl get deployments
+   kubectl get pods
+
+---
+
+### Method 2: Editing Deployment Live Using kubectl edit
+1. Opened deployment YAML in an editor:
+   kubectl edit deployment nginx-deployment
+
+2. Located the line with `replicas: 3`
+
+3. Changed it to:
+   replicas: 5
+
+4. Saved and exited the editor.
+
+5. Verified pods and deployment scaled:
+   kubectl get deployments
+   kubectl get pods
+
+---
+
+### Method 3: Updating Deployment YAML File and Re-applying
+1. Downloaded the current deployment YAML:
+   kubectl get deployment nginx-deployment -o yaml > nginx-deployment.yaml
+
+2. Opened `nginx-deployment.yaml` in a text editor.
+
+3. Modified the replicas field:
+   replicas: 5
+
+4. Applied the updated YAML:
+   kubectl apply -f nginx-deployment.yaml
+
+5. Verified the deployment and pods:
+   kubectl get deployments
+   kubectl get pods
+
+---
+
+### Verification:
+- Confirmed 5 pods are running for the `nginx-deployment`.
+- All pods are in `Running` status.
+
+---
+
+### Summary:
+Scaling deployments in Kubernetes can be done via different methods depending on use case:
+- `kubectl scale` is quick for one-off changes.
+- `kubectl edit` is useful for live changes.
+- Editing YAML and applying is recommended for version-controlled declarative infrastructure.
+
+Increasing replicas helps with load balancing, fault tolerance, and application availability.
