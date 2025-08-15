@@ -1,0 +1,60 @@
+Assignment 3: Scaling Existing NGINX Deployment to 5 Replicas
+
+---------------------------------------------
+✅ Task: Use Previous Deployment and Change Replicas to 5
+---------------------------------------------
+
+1. Checked the existing deployment and number of replicas:
+   Command:
+   kubectl get deployments
+
+   Output showed:
+   nginx-deployment   3 replicas
+
+2. Scaled the deployment to 5 replicas using kubectl scale:
+   Command:
+   kubectl scale deployment nginx-deployment --replicas=5
+
+3. Verified the deployment was scaled:
+   Command:
+   kubectl get deployments
+
+   Expected output:
+   nginx-deployment   5 replicas
+
+4. Verified the pods to confirm 5 pods are running:
+   Command:
+   kubectl get pods
+
+   Expected output:
+   5 pods with names starting with nginx-deployment, all in Running state.
+
+---------------------------------------------
+⚙️ Alternative Method: Editing Deployment YAML
+---------------------------------------------
+
+1. Opened the deployment YAML in edit mode:
+   Command:
+   kubectl edit deployment nginx-deployment
+
+2. Found the `replicas` field and updated the value from 3 to 5:
+   Before:
+     replicas: 3
+   After:
+     replicas: 5
+
+3. Saved and exited the editor.
+
+4. Verified the changes using:
+   kubectl get deployments
+   kubectl get pods
+
+---------------------------------------------
+✅ Summary:
+---------------------------------------------
+
+- The NGINX deployment was successfully scaled from 3 to 5 replicas.
+- This increases the number of pod instances running the NGINX web server.
+- Scaling deployments is an essential feature in Kubernetes to manage workload and availability.
+
+---------------------------------------------
