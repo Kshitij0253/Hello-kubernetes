@@ -110,6 +110,10 @@ Check:
 kubectl get deployments
 kubectl describe deployment nginx-deployment
 
+Delete EKS Cluster :
+eksctl delete cluster --name my-lab-cluster --region ap-south-1
+
+
 Summary
 
 Task | Command
