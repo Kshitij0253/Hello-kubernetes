@@ -1,0 +1,76 @@
+Assignment 4: Change NGINX Service Type from NodePort to ClusterIP
+
+---------------------------------------------
+✅ Task:
+1. Use the existing NGINX deployment.
+2. Change the existing service type from NodePort to ClusterIP.
+
+---------------------------------------------
+Step 1: Verify existing service
+Command:
+kubectl get svc
+
+Example output shows:
+NAME                     TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+nginx-nodeport-service   NodePort   10.x.x.x        <none>        80:30080/TCP   10m
+
+---------------------------------------------
+Step 2: Change service type to ClusterIP
+
+Method 1: Edit service live with kubectl edit
+------------------------------------------------
+Command:
+kubectl edit svc nginx-nodeport-service
+
+- In the editor, find the line:
+  type: NodePort
+
+- Change it to:
+  type: ClusterIP
+
+- Save and exit the editor.
+
+Method 2: Delete and recreate service with ClusterIP type
+----------------------------------------------------------
+1. Delete the existing NodePort service:
+   kubectl delete svc nginx-nodeport-service
+
+2. Create a new YAML file named `nginx-clusterip-service.yaml`:
+
+---------------------------------------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-clusterip-service
+spec:
+  type: ClusterIP
+  selector:
+    app: nginx
+  ports:
+    - port: 80
+      targetPort: 80
+---------------------------------------------------------
+
+3. Apply the new service:
+   kubectl apply -f nginx-clusterip-service.yaml
+
+---------------------------------------------
+Step 3: Verify the new service
+Command:
+kubectl get svc
+
+Expected output:
+NAME                     TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)   AGE
+nginx-clusterip-service  ClusterIP   10.x.x.x         <none>        80/TCP    x min
+
+---------------------------------------------
+Notes:
+- ClusterIP service exposes the application only inside the Kubernetes cluster.
+- It is not accessible directly from outside nodes or the internet.
+- ClusterIP is useful for internal communication between pods or other services.
+- If external access is required, NodePort or LoadBalancer services should be used.
+
+---------------------------------------------
+Summary:
+- Successfully changed the NGINX service type from NodePort to ClusterIP.
+- Verified that the service is running and accessible internally.
